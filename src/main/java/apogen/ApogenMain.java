@@ -9,6 +9,7 @@ public class ApogenMain {
 	 * @throws JSONException 
 	 */
 	 public static void main(String args[]) throws Exception {
+		 displaySettings();
 		 new ApogenMain().run();
 	 }
 	
@@ -24,6 +25,13 @@ public class ApogenMain {
 			CodeGenerator.run();
 	
 		System.exit(0);
+	}
+	
+	private static void displaySettings() {
+		System.out.println("[LOG]\tINITIALIZING APOGEN (Automatic Page Object Generator)");
+		System.out.println("[LOG]\tUrl: " + Settings.URL);
+		System.out.println("[LOG]\tCrawling: " + Settings.CRAWLING);
+		System.out.println("[LOG]\tClustering: " + Settings.CLUSTERING);
 	}
     
 }
