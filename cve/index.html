@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>APOGEN Cluster Visual Editor</title>
+
+    <script src="d3.v3.min.js" type="text/javascript"></script>
+    <script src="jquery.js" type="text/javascript"></script>
+    <script src="main.js" type="text/javascript"></script>
+    <script src="Blob.js" type="text/javascript"></script>
+    <script src="FileSaver.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" type="text/css" href="my.css">
+
+</head>
+<body>
+    <h2>APOGEN Cluster Visual Editor</h2>
+    <p>Drag the states outside or inside the clusters to modify the configuration</p>
+
+    <script type="text/javascript">
+
+        var w = 800,
+            h = 600,
+            fill = d3.scale.category20();
+
+        /* ************************************************************
+        *********************** DATA CREATION *************************
+        ************************************************************  */
+
+        var json = d3.json("clusters.json", function(data) {
+            
+            var nodes = [];
+            var groups = [];
+
+            var count = 0;
+
+            var clustersMap = d3.nest()
+                .key(function(d) {return d.clusterId;})
+                .sortKeys(d3.ascending)
+                .entries(data);
+
+            console.log("#States: " + data.length)
+            console.log("#Clusters: " + clustersMap.length)         
+
+            nodes = data;
+            //d3.range(count).map(Object);
+            //console.log(printNodes());
+
+            function printNodes(){
+                for (var i = nodes.length - 1; i >= 0; i--) {
+                console.log(nodes[i].stateId + " is in " + 
+                    "cluster " + nodes[i].clusterId)
+                };
+            }
+
+            function printClusters(){
+                for (var i = 0 ; i < clustersMap.length; i++) {
+                    console.log("cluster " + i
+                        + " has " + clustersMap[i].values.length + " points");
+                };
+            }
+
+            // Draws the pentagon shape
+            var groupPath = function (d) {
+                return "M" +
+                d3.geom.hull(d.map(function (e) { return [e.x, e.y]; }))
+                    .join("L")
+                + "Z";
+            };
+
+        groups.init = function () {
+            
+            var c = clustersMap.length;
+
+            groups.a = Math.min(w, h);
+            groups.r = groups.a * 0.20;
+
+            // initialise groups around a circle shape
+            for (i = 0; i < c; i++) {
+                
+                var g = [];
+                g.groupId = i;
+                g.x = w / 2;
+                g.y = h / 2;
+
+                // makes the clusters drawing 
+                g.x = Math.cos(i / c * 2 * Math.PI) * 250 + w / 2 + Math.random();
+                g.y = Math.sin(i / c * 2 * Math.PI) * 250 + h / 2 + Math.random();
+
+                // because Muccia'd make them exagonal
+                var shapeOfVisualisedCluster = 6;
+                var howManyGood = clustersMap[i].values.length;
+                var howManyDummy = shapeOfVisualisedCluster-howManyGood;
+                 
+                for (j = 0; j < shapeOfVisualisedCluster; j++) {
+                    var alpha = (2 * Math.PI * j / shapeOfVisualisedCluster); 50
+                    var dummy = { x: g.x + 10 * Math.sin(alpha), y: g.y + 10 * Math.cos(alpha) };
+                    g.push(dummy);
+                }
+            
+                groups[i] = g;
+
+            };
+
+        }
+
+        groups.snap = function (d) {
+
+            function change(d, to) {
+                if (d.groupId != null) {
+                    var oldGroup = groups[d.groupId];
+                    var index = oldGroup.indexOf(d);
+                    if (index >= 0) {
+                        oldGroup.splice(index, 1);
+                    }
+                }
+
+                if (to == null) {
+                    d.groupId = null;
+                    nodes[nodes.indexOf(d)].clusterId = null;
+                } else {
+                    // check
+                    nodes[nodes.indexOf(d)].clusterId = to.groupId;
+                    d.groupId = to.groupId;
+                    to.push(d);
+                }
+            }
+
+            groups.forEach(function (g) {
+                var distance = Math.sqrt(Math.pow(d.x - g.x, 2) + Math.pow(d.y - g.y, 2));
+                if (distance < groups.r) {
+                    if (d.groupId != g.groupId) {
+                        change(d, g);
+                    }
+                } else {
+                    if (d.groupId == g.groupId) {
+                        change(d, null)
+                    }
+                }
+            });
+
+        }
+
+        groups.save = function (d) {
+            
+            try {
+                var isFileSaverSupported = !!new Blob();
+            } catch (e) {
+                alert("blob not supported");
+            }
+
+            var result = d3.nest()
+                .key(function(d) {return d.clusterId;})
+                .sortKeys(d3.ascending)
+                .entries(clustersMap);
+            
+            var result = "";
+            var output = {};
+            var indexes = d3.keys(clustersMap);
+    
+            for(var c = 0; c < indexes.length; c++){
+                output[c] = "";
+            }
+
+            for(var i = 0; i < nodes.length; i++){
+                output[nodes[i].clusterId] += nodes[i].stateId + ";";
+            }
+
+            for(var c = 0; c < indexes.length; c++){
+                result += c + ";" + output[c] + "\n";
+            }
+
+            console.log(result);
+
+            var blob = new Blob([result], {type: "text/text"});
+            saveAs(blob, "clustersModified.txt");           
+        }
+
+        groups.delta = function (d) {
+
+            function massCenter(g) {
+                var x = 0, y = 0;
+                g.forEach(function (e) {
+                    x += e.x;
+                    y += e.y;
+                });
+                return { x: x / g.length, y: y / g.length };
+            }
+
+            if (d.groupId == null) return 0;
+            var g = groups[d.groupId];
+            var massCenter = massCenter(g);
+            var delta = {
+                x: g.x - massCenter.x,
+                y: g.y - massCenter.y
+            }
+            return delta;
+        }
+
+        groups.createInitial = function (n) {
+            
+            for (var i = 0; i <= n.length - 1; i++) {
+                var where = n[i].clusterId;
+                n[i].groupId = groups[where].groupId;
+                groups[where].push(n[i]);
+            };
+            
+        }
+
+        groups.init();
+
+        var nodeFill = function (n) { 
+            return n.groupId != null ? fill(n.groupId) : "black"; 
+        };
+
+        /* ************************************************************
+        ***************** VISUALIZATION AND RENDERING *****************
+        ************************************************************  */
+
+        var helloMsg = alert("Welcome to APOGEN Clusters Visual Editor, developed with D3.js library");
+
+      
+        var refreshButton = d3.select("body")
+            .append("button")
+            .text("Refresh")
+            .attr("id", "button")
+            .on("click", function() {
+                location.reload(true);
+        });
+		
+        var saveButton = d3.select("body")
+            .append("button")
+            .text("Save")
+            .attr("id", "button1")
+            .on("click", function() {
+                groups.save();
+                d3.event.stopPropagation()
+            .append("br")
+            .append("br");
+        });
+
+        // Define 'div' for tooltips
+        var div = d3.select("body")
+            .append("div")                     // declare the properties for the div used for the tooltips
+            .attr("id", "tooltip")
+            .attr("class", "tooltip")          // apply the 'tooltip' class
+            .style("opacity", 0);
+
+        var vis = d3.select("body")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h)
+            .attr("style", "outline: thin solid red;")
+            .attr("id", "svg")
+
+        var force = d3.layout.force()
+            .nodes(nodes)
+            .links([])
+            .size([w, h])
+            .gravity(.05)
+            .distance(50)
+            .charge(-50)
+            .start(helloMsg);
+        
+        var node = vis.selectAll("node")
+            .data(nodes)
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+            .on("mousemove", groups.snap)
+            .call(force.drag());
+       
+        node.append("circle")
+            .attr("class", "node")
+            .attr("r", 8);
+        
+        node.append("text")
+            .attr("class", "node")
+            //.attr("title", function(d) { return d.stateId })
+            .text(function(d) { return d.stateId })
+            // Tooltip stuff after this
+            .on("mouseover", function(d) {
+                var name = d.stateId.replace(".html", ".jpg");      // when the mouse goes over a circle, do the following
+                div.transition()                                    // declare the transition properties to bring fade-in div
+                .duration(200)                                      // it shall take 200ms
+                .style("opacity", 1);                               // and go all the way to an opacity of .9
+               div .html("<img id = 'tooltip' src='../output/screenshots/" + name + "'/>")  // add the text of the tooltip as html  
+                .style("left", (d3.event.pageX+10) + "px")             // move it in the x direction 
+                .style("top", (d3.event.pageY-10) + "px");             // move it in the y direction
+            })                                                      // 
+            .on("mouseout", function(d) {                           // when the mouse leaves a circle, do the following
+                div.transition()                                    // declare the transition properties to fade-out the div
+                .duration(2000)                                      // it shall take 500ms
+                .style("opacity", 0);                               // and go all the way to an opacity of nil
+            }); 
+
+        var group = vis.selectAll("path")
+            .data(groups)
+            .attr("d", groupPath)
+            .attr("class", "group")
+            .enter().insert("path", "node")
+              .style("fill", nodeFill)
+              .style("stroke", nodeFill)
+              .style("stroke-width", 40)
+              .style("stroke-linejoin", "round")
+              .style("opacity", .2)
+        
+        force.on("tick", function (e) {
+            
+            nodes.forEach(function (o) {
+                if (o.groupId == null) {
+                    return;
+                }
+                o.x += groups.delta(o).x * .3;
+                o.y += groups.delta(o).y * .3;
+            });
+
+            node.selectAll(".node")
+                //.attr("cx", function (d) { return d.x; })
+                //.attr("cy", function (d) { return d.y; })
+                .style("fill", nodeFill)
+                .attr("cluster", function (d) { 
+                    return (d.groupId == null? 'none' : d.groupId); 
+                })
+
+            node.selectAll("circle.node")
+                .attr("r", function (d) { 
+                    return (d.groupId == null? 8 : 12); 
+                })
+
+            node.selectAll("text.node")
+                .attr("dx", 15)
+                .attr("dy", ".20em")
+            
+            node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+            group.attr("d", groupPath);
+
+            //force.start();
+        });
+
+        groups.createInitial(nodes);
+
+        });
+
+    </script>
+</body>
+</html>

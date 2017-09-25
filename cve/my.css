@@ -1,0 +1,13 @@
+
+#tooltip {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	width: 350px;
+	height: 250px;
+	border: 1px solid #73AD21;
+}
+
+html {
+	font-family: Palatino;
+}
