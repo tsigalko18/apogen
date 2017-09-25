@@ -32,6 +32,7 @@ import org.xml.sax.SAXException;
 import treeEdit.LblTree;
 import treeEdit.RTED_InfoTree_Opt;
 import abstractdt.Cluster;
+import abstractdt.Getter;
 
 import com.crawljax.util.DomUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;

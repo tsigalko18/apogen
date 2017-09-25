@@ -15,7 +15,7 @@
 	</properties>
 
 	<build>
-		<sourceDirectory>src</sourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
 		<pluginManagement>
 			<plugins>
 				<plugin>

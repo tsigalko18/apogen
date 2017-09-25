@@ -32,6 +32,7 @@ import abstractdt.Form;
 import abstractdt.FormField;
 import abstractdt.InputField;
 import abstractdt.State;
+import abstractdt.Getter;
 
 /**
  * Utils class containing auxiliary and configuration methods for the Code
