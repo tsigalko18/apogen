@@ -52,7 +52,8 @@ public class CodeGenerator {
 			
 			UtilsCodeGenerator.setGettersMethods(c, s);
 			
-			s.setSourceCode(c.toString());
+			UtilsCodeGenerator.setSourceCode(c, s);
+			
 		}
 		
 	}

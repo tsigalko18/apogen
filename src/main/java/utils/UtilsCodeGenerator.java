@@ -542,4 +542,8 @@ public class UtilsCodeGenerator {
 		}
 
 	}
+
+	public static void setSourceCode(CompilationUnit c, State s) {
+		s.setSourceCode(c.toString());
+	}
 }

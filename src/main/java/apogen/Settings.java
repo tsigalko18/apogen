@@ -21,7 +21,7 @@ public class Settings {
 	public static final String BROWSER = "FF"; // PH-FF
 
 	// Apogen Settings
-	public static boolean CRAWLING = false;
+	public static boolean CRAWLING = true;
 	public static boolean CLUSTERING = true;
 	public static boolean REPEAT_STATIC_ANALYSIS = true;
 	public static boolean GENERATE_CODE = true;
