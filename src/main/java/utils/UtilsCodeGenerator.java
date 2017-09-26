@@ -1,5 +1,17 @@
 package utils;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+
+import abstractdt.CandidateWebElement;
+import abstractdt.Edge;
+import abstractdt.Form;
+import abstractdt.FormField;
+import abstractdt.InputField;
+import abstractdt.State;
 import japa.parser.ASTHelper;
 import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.ImportDeclaration;
@@ -20,20 +32,6 @@ import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.NormalAnnotationExpr;
 import japa.parser.ast.stmt.BlockStmt;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-
-import abstractdt.CandidateWebElement;
-import abstractdt.Edge;
-import abstractdt.Form;
-import abstractdt.FormField;
-import abstractdt.InputField;
-import abstractdt.State;
-import abstractdt.Getter;
-
 /**
  * Utils class containing auxiliary and configuration methods for the Code
  * Generator
@@ -53,8 +51,8 @@ public class UtilsCodeGenerator {
 	}
 
 	/**
-	 * returns a CompilationUnit object decorated with package and some basic
-	 * import instructions
+	 * returns a CompilationUnit object decorated with package and some basic import
+	 * instructions
 	 * 
 	 * @return
 	 */
@@ -66,16 +64,15 @@ public class UtilsCodeGenerator {
 	}
 
 	/**
-	 * set the TypeDeclaration of a CompilationUnit i.e., whether is a class or
-	 * an interface
+	 * set the TypeDeclaration of a CompilationUnit i.e., whether is a class or an
+	 * interface
 	 * 
 	 * @param c
 	 * @param className
 	 */
 	public static void setTypeDeclaration(CompilationUnit c, String className) {
 		// create the type declaration
-		ClassOrInterfaceDeclaration type = new ClassOrInterfaceDeclaration(
-											ModifierSet.PUBLIC, false, className);
+		ClassOrInterfaceDeclaration type = new ClassOrInterfaceDeclaration(ModifierSet.PUBLIC, false, className);
 
 		ASTHelper.addTypeDeclaration(c, type);
 	}
@@ -83,15 +80,15 @@ public class UtilsCodeGenerator {
 	/**
 	 * adds a WebDriver instance to the CompilationUnit c
 	 * 
-	 * @param c CompilationUnit
+	 * @param c
+	 *            CompilationUnit
 	 */
 	public static void setWebDriverVariable(CompilationUnit c) {
 
 		VariableDeclarator v = new VariableDeclarator();
 		v.setId(new VariableDeclaratorId("driver"));
 
-		FieldDeclaration f = ASTHelper.createFieldDeclaration(
-				ModifierSet.PRIVATE,
+		FieldDeclaration f = ASTHelper.createFieldDeclaration(ModifierSet.PRIVATE,
 				ASTHelper.createReferenceType("WebDriver", 0), v);
 
 		ASTHelper.addMember(c.getTypes().get(0), f);
@@ -105,30 +102,27 @@ public class UtilsCodeGenerator {
 	 * @param s
 	 */
 	public static void setDefaultConstructor(CompilationUnit c, State s) {
-		
-        // creates the class constructor
+
+		// creates the class constructor
 		ConstructorDeclaration constructor = new ConstructorDeclaration();
 		constructor.setName(s.getName());
 		constructor.setModifiers(ModifierSet.PUBLIC);
 
-        // sets the WebDriver instance parameter
+		// sets the WebDriver instance parameter
 		List<Parameter> parameters = new LinkedList<>();
-		parameters.add(ASTHelper.createParameter(
-				ASTHelper.createReferenceType("WebDriver", 0), "driver"));
+		parameters.add(ASTHelper.createParameter(ASTHelper.createReferenceType("WebDriver", 0), "driver"));
 
 		constructor.setParameters(parameters);
-		constructor.setJavaDoc(new JavadocComment("\n\t\tPage Object for "
-				+ s.getName() + " (" + s.getStateId() + ") \n\t"));
+		constructor.setJavaDoc(
+				new JavadocComment("\n\t\tPage Object for " + s.getName() + " (" + s.getStateId() + ") \n\t"));
 
 		// add the body to the constructor
 		BlockStmt constructor_block = new BlockStmt();
 		constructor.setBlock(constructor_block);
 
 		// add basic statements do the constructor method body
-		ASTHelper.addStmt(constructor_block, new NameExpr(
-				"this.driver = driver"));
-		ASTHelper.addStmt(constructor_block, new NameExpr(
-				"PageFactory.initElements(driver, this)"));
+		ASTHelper.addStmt(constructor_block, new NameExpr("this.driver = driver"));
+		ASTHelper.addStmt(constructor_block, new NameExpr("PageFactory.initElements(driver, this)"));
 
 		ASTHelper.addMember(c.getTypes().get(0), constructor);
 	}
@@ -148,12 +142,9 @@ public class UtilsCodeGenerator {
 	private static List<ImportDeclaration> getAllImports() {
 		List<ImportDeclaration> imports = new LinkedList<>();
 
-		imports.add(new ImportDeclaration(
-                        new NameExpr("org.openqa.selenium"), false, true));
-		imports.add(new ImportDeclaration(
-                        new NameExpr("org.openqa.selenium.support.FindBy"), false, false));
-		imports.add(new ImportDeclaration(
-                        new NameExpr("org.openqa.selenium.support.PageFactory"), false, false));
+		imports.add(new ImportDeclaration(new NameExpr("org.openqa.selenium"), false, true));
+		imports.add(new ImportDeclaration(new NameExpr("org.openqa.selenium.support.FindBy"), false, false));
+		imports.add(new ImportDeclaration(new NameExpr("org.openqa.selenium.support.PageFactory"), false, false));
 
 		return imports;
 	}
@@ -167,8 +158,7 @@ public class UtilsCodeGenerator {
 	 * @param webElements
 	 *            List<CandidateWebElement>
 	 */
-	public static void setVariables(CompilationUnit c,
-			Set<CandidateWebElement> webElements) {
+	public static void setVariables(CompilationUnit c, Set<CandidateWebElement> webElements) {
 
 		setWebElements(c, webElements);
 		setWebDriverVariable(c);
@@ -183,16 +173,14 @@ public class UtilsCodeGenerator {
 	 * @param webElements
 	 *            List<CandidateWebElement>
 	 */
-	private static void setWebElements(CompilationUnit c,
-			Set<CandidateWebElement> webElements) {
+	private static void setWebElements(CompilationUnit c, Set<CandidateWebElement> webElements) {
 
 		for (CandidateWebElement cwe : webElements) {
 
 			VariableDeclarator webElement = new VariableDeclarator();
 			webElement.setId(new VariableDeclaratorId(cwe.getVariableName()));
 
-			FieldDeclaration field = ASTHelper.createFieldDeclaration(
-					ModifierSet.PRIVATE,
+			FieldDeclaration field = ASTHelper.createFieldDeclaration(ModifierSet.PRIVATE,
 					ASTHelper.createReferenceType("WebElement", 0), webElement);
 
 			List<AnnotationExpr> list_espr = new LinkedList<>();
@@ -223,8 +211,8 @@ public class UtilsCodeGenerator {
 	}
 
 	/**
-	 * For each CompilationUnit c associated to a State s creates the link
-	 * methods to navigate towards other page objects
+	 * For each CompilationUnit c associated to a State s creates the link methods
+	 * to navigate towards other page objects
 	 * 
 	 * @param c
 	 * @param s
@@ -233,82 +221,75 @@ public class UtilsCodeGenerator {
 
 		for (Edge edge : s.getLinks()) {
 
-			String towards = UtilsStaticAnalyzer.getStateNameFromStateId(
-					edge.getTo());
+			String towards = UtilsStaticAnalyzer.getStateNameFromStateId(edge.getTo());
 
 			// add the necessary import
-			ImportDeclaration new_import = new ImportDeclaration(
-                                new NameExpr("po." + towards), false, false);
-			
-			if(!towards.equals("") && !c.getImports().contains(new_import)){
+			ImportDeclaration new_import = new ImportDeclaration(new NameExpr("po." + towards), false, false);
+
+			if (!towards.equals("") && !c.getImports().contains(new_import)) {
 				c.getImports().add(new_import);
 			}
-			
+
 			String l = edge.getVia();
 			l = l.replace("xpath ", "");
 			String we = s.getWebElementNameFromLocator(l);
 
 			if (we.equals("")) {
-                            System.err.println(
-                                "[ERROR] UtilsCodeGenerator.setLinkMethods getWebElementNameFromLocator failed");
-				//System.exit(1);
+				System.err.println("[ERROR] UtilsCodeGenerator.setLinkMethods getWebElementNameFromLocator failed");
+				// System.exit(1);
 			}
 
 			String eventType = edge.getEvent() + "()";
-			
-			MethodDeclaration method = 
-                            new MethodDeclaration(
-                                ModifierSet.PUBLIC, ASTHelper.createReferenceType(
-                                    towards, 0), "goTo" + towards);
-                                    // + "_via_" + we);	
-			
+
+			MethodDeclaration method = new MethodDeclaration(ModifierSet.PUBLIC,
+					ASTHelper.createReferenceType(towards, 0), "goTo" + towards);
+			// + "_via_" + we);
+
 			// add a body to the method
 			BlockStmt block = new BlockStmt();
 			method.setBody(block);
 
 			// add a statement do the method body
 			ASTHelper.addStmt(block, new NameExpr(we + "." + eventType));
-			ASTHelper.addStmt(block, new NameExpr("return new " 
-                                + towards + "(driver)"));
+			ASTHelper.addStmt(block, new NameExpr("return new " + towards + "(driver)"));
 
 			String name = method.getName();
 			int occ = 0;
-			
+
 			for (BodyDeclaration bd : c.getTypes().get(0).getMembers()) {
-                            if(bd instanceof MethodDeclaration){
-                                if(((MethodDeclaration) bd).getName().contains(name)){
-                                    occ++;
+				if (bd instanceof MethodDeclaration) {
+					if (((MethodDeclaration) bd).getName().contains(name)) {
+						occ++;
+					}
 				}
-                            }
 			}
-			
-			if(occ > 0){
+
+			if (occ > 0) {
 				method.setName(name + "_" + occ);
 			}
-			
+
 			ASTHelper.addMember(c.getTypes().get(0), method);
 		}
 	}
 
 	private static int countTowards(Set<Edge> links, Edge edge3) {
-		
+
 		int c = 0;
-		
+
 		for (Edge edge : links) {
-			if(edge3.getTo().equals(edge.getTo())){
+			if (edge3.getTo().equals(edge.getTo())) {
 				c++;
 			}
 		}
-		
+
 		return c;
 	}
 
 	/**
-	 * For each CompilationUnit c associated to a State s creates the form
-	 * methods.
+	 * For each CompilationUnit c associated to a State s creates the form methods.
 	 * <p>
-	 * It follows a naive approach: parses the form objects and puts everything
-	 * in the method
+	 * It follows a naive approach: parses the form objects and puts everything in
+	 * the method
 	 * </p>
 	 * 
 	 * @param c
@@ -324,8 +305,7 @@ public class UtilsCodeGenerator {
 
 		for (Form f : s.getForms()) {
 
-			MethodDeclaration method = new MethodDeclaration(
-					ModifierSet.PUBLIC, ASTHelper.VOID_TYPE, f.getFormName());
+			MethodDeclaration method = new MethodDeclaration(ModifierSet.PUBLIC, ASTHelper.VOID_TYPE, f.getFormName());
 			BlockStmt block = new BlockStmt();
 			method.setBody(block);
 
@@ -347,11 +327,11 @@ public class UtilsCodeGenerator {
 	}
 
 	/**
-	 * /** For each CompilationUnit c associated to a State s creates the form
+	 * For each CompilationUnit c associated to a State s creates the form
 	 * methods.
 	 * <p>
-	 * It follows a more sophisticated approach: parses the form objects and
-	 * creates a method for each submit/button only
+	 * It follows a more sophisticated approach: parses the form objects and creates
+	 * a method for each submit/button only
 	 * </p>
 	 * 
 	 * @param c
@@ -360,8 +340,7 @@ public class UtilsCodeGenerator {
 	 *            State
 	 * @throws Exception
 	 */
-	public static void setFormMethodsFromButtonAndSubmit(CompilationUnit c,
-			State s) throws Exception {
+	public static void setFormMethodsFromButtonAndSubmit(CompilationUnit c, State s) throws Exception {
 
 		if (s.getForms() == null) {
 			return;
@@ -370,11 +349,10 @@ public class UtilsCodeGenerator {
 		for (Form f : s.getForms()) {
 
 			for (InputField i : f.getSubmitList()) {
-				System.out.println("[LOG] " + f.getSubmitList().size()
-						+ " submit/button(s) found in form " + f.getFormName());
+				System.out.println(
+						"[LOG] " + f.getSubmitList().size() + " submit/button(s) found in form " + f.getFormName());
 
-				MethodDeclaration method = new MethodDeclaration(
-						ModifierSet.PUBLIC, ASTHelper.VOID_TYPE,
+				MethodDeclaration method = new MethodDeclaration(ModifierSet.PUBLIC, ASTHelper.VOID_TYPE,
 						f.getFormName() + "_" + i.getVariableName());
 
 				BlockStmt block = new BlockStmt();
@@ -407,44 +385,37 @@ public class UtilsCodeGenerator {
 
 	}
 
-	private static void addParameterToFormMethod(Form f,
-			MethodDeclaration method) {
+	private static void addParameterToFormMethod(Form f, MethodDeclaration method) {
 
-		Parameter par = ASTHelper.createParameter(
-				ASTHelper.createReferenceType("String", 0), "param");
+		Parameter par = ASTHelper.createParameter(ASTHelper.createReferenceType("String", 0), "param");
 		par.setVarArgs(false);
 		ASTHelper.addParameter(method, par);
 
 	}
 
-	private static void addIndexedParameterToFormMethod(Form f, int i,
-			MethodDeclaration method) {
+	private static void addIndexedParameterToFormMethod(Form f, int i, MethodDeclaration method) {
 
 		if (f.getFormFieldList().get(i).getDefaultAction().equals("sendKeys")) {
-			Parameter par = ASTHelper.createParameter(
-					ASTHelper.createReferenceType("String", 0), "args" + i);
+			Parameter par = ASTHelper.createParameter(ASTHelper.createReferenceType("String", 0), "args" + i);
 			par.setVarArgs(false);
 			ASTHelper.addParameter(method, par);
 		}
 
 	}
 
-	private static void addFormInstructionToBlockMethod(BlockStmt block,
-			Form f, FormField field) {
+	private static void addFormInstructionToBlockMethod(BlockStmt block, Form f, FormField field) {
 
 		switch (field.getDefaultAction()) {
-			case "sendKeys" :
-				ASTHelper.addStmt(block, new NameExpr(field.getVariableName()
-						+ "." + field.getDefaultAction() + "(args"
-						+ f.getFormFieldList().indexOf(field) + ")"));
-				break;
+		case "sendKeys":
+			ASTHelper.addStmt(block, new NameExpr(field.getVariableName() + "." + field.getDefaultAction() + "(args"
+					+ f.getFormFieldList().indexOf(field) + ")"));
+			break;
 
-			case "click" :
-				ASTHelper.addStmt(block, new NameExpr(field.getVariableName()
-						+ "." + field.getDefaultAction() + "()"));
-				break;
-			default :
-				break;
+		case "click":
+			ASTHelper.addStmt(block, new NameExpr(field.getVariableName() + "." + field.getDefaultAction() + "()"));
+			break;
+		default:
+			break;
 		}
 
 	}
@@ -456,7 +427,7 @@ public class UtilsCodeGenerator {
 	 * @return
 	 */
 	public static String formatToVariableName(String s) {
-		
+
 		String res = s;
 
 		res = UtilsStaticAnalyzer.toSentenceCase(res);
@@ -487,8 +458,7 @@ public class UtilsCodeGenerator {
 			VariableDeclarator webElement = new VariableDeclarator();
 			webElement.setId(new VariableDeclaratorId(d.getWebElementName()));
 
-			FieldDeclaration field = ASTHelper.createFieldDeclaration(
-					ModifierSet.PRIVATE,
+			FieldDeclaration field = ASTHelper.createFieldDeclaration(ModifierSet.PRIVATE,
 					ASTHelper.createReferenceType("WebElement", 0), webElement);
 
 			List<AnnotationExpr> list_espr = new LinkedList<AnnotationExpr>();
@@ -513,29 +483,23 @@ public class UtilsCodeGenerator {
 			// /////////////////////////////////////////////////////////////
 			// Add the Getter method
 			// /////////////////////////////////////////////////////////////
-			MethodDeclaration method = new MethodDeclaration(
-					ModifierSet.PUBLIC, ASTHelper.createReferenceType("String",
-							0), "get_" + d.getWebElementName());
+			MethodDeclaration method = new MethodDeclaration(ModifierSet.PUBLIC,
+					ASTHelper.createReferenceType("String", 0), "get_" + d.getWebElementName());
 
 			// add a body to the method
 			BlockStmt block = new BlockStmt();
 			method.setBody(block);
 
 			/**
-			 * public String getGroupsName() { return groupContainer.getText();
-			 * }
+			 * public String getGroupsName() { return groupContainer.getText(); }
 			 */
-			JavadocComment javaDoc = new JavadocComment("\n\t\tsource: "
-					+ d.getSourceState() + "" + "\n\t\ttarget: "
-					+ d.getTargetState() + "" + "\n\t\tcause: " + d.getCause()
-					+ "" + "\n\t\tbefore: " + d.getBefore() + ""
-					+ "\n\t\tafter: " + d.getAfter() + "" + " \n\t");
+			JavadocComment javaDoc = new JavadocComment("\n\t\tsource: " + d.getSourceState() + "" + "\n\t\ttarget: "
+					+ d.getTargetState() + "" + "\n\t\tcause: " + d.getCause() + "" + "\n\t\tbefore: " + d.getBefore()
+					+ "" + "\n\t\tafter: " + d.getAfter() + "" + " \n\t");
 			method.setJavaDoc(javaDoc);
 
 			// add a statement do the method body
-			ASTHelper.addStmt(block,
-					new NameExpr("return " + d.getWebElementName()
-							+ ".getText()"));
+			ASTHelper.addStmt(block, new NameExpr("return " + d.getWebElementName() + ".getText()"));
 
 			ASTHelper.addMember(c.getTypes().get(0), method);
 

@@ -44,170 +44,181 @@ public class UtilsDiff {
 		}
 		return domParser.getDocument();
 	}
-	
+
 	/**
 	 * BETA version of APOGEN-DOM-differencing mechanism
+	 * 
 	 * @param doc1
 	 * @param doc2
 	 * @return list of Differences
 	 * @throws ParserConfigurationException
-	 * @throws IOException 
-	 * @throws SAXException 
+	 * @throws IOException
+	 * @throws SAXException
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<Difference> customisedDomDiff(String string, String string2) throws ParserConfigurationException, SAXException, IOException {
-		
+	public static List<Difference> customisedDomDiff(String string, String string2)
+			throws ParserConfigurationException, SAXException, IOException {
+
 		org.w3c.dom.Document doc1 = asDocument(string, true);
 		org.w3c.dom.Document doc2 = asDocument(string2, true);
-		
+
 		XMLUnit.setControlParser("org.apache.xerces.jaxp.DocumentBuilderFactoryImpl");
 		XMLUnit.setTestParser("org.apache.xerces.jaxp.DocumentBuilderFactoryImpl");
 		XMLUnit.setSAXParserFactory("org.apache.xerces.jaxp.SAXParserFactoryImpl");
-		
+
 		XMLUnit.setNormalizeWhitespace(true);
 		XMLUnit.setIgnoreAttributeOrder(true);
 		XMLUnit.setIgnoreWhitespace(true);
 		XMLUnit.setIgnoreComments(true);
 		XMLUnit.setNormalize(true);
 		XMLUnit.setIgnoreDiffBetweenTextAndCDATA(false);
-		
+
 		Diff d = new Diff(doc1, doc2);
 		DetailedDiff dd = new DetailedDiff(d);
-		
+
 		dd.overrideDifferenceListener(new DomDifferenceListener());
 		dd.overrideElementQualifier(null);
-		
+
 		return dd.getAllDifferences();
 	}
-	
+
 	/**
 	 * prints diff
-	 * @param target 
-	 * @param source 
+	 * 
+	 * @param target
+	 * @param source
 	 * @param diff
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	public static List<abstractdt.Getter> printsDiff(String source, String target, List<Difference> diff) throws IOException {
-		
+	public static List<abstractdt.Getter> printsDiff(String source, String target, List<Difference> diff)
+			throws IOException {
+
 		List<abstractdt.Getter> personalisedDiffList = new LinkedList<abstractdt.Getter>();
-		
+
 		// PRETTY PRINTS RESULTS BASED ON THE KIND OF DIFFERENCE
 		for (Difference difference : diff) {
-			
+
 			abstractdt.Getter proposedDiff = null;
-			
+
 			switch (difference.getId()) {
-			
+
 			// DIFFERENT TEXT VALUES: using getNodeValue() to retrieve the text
 			case DifferenceConstants.TEXT_VALUE_ID:
-				
-				if( !difference.getTestNodeDetail().getValue().equals("TITLE") && 
-					!difference.getTestNodeDetail().getValue().equals("SCRIPT") ){
-					
+
+				if (!difference.getTestNodeDetail().getValue().equals("TITLE")
+						&& !difference.getTestNodeDetail().getValue().equals("SCRIPT")) {
+
 					String newLocator = difference.getTestNodeDetail().getXpathLocation();
-					
-					if(newLocator.contains("text()")){
-						newLocator = newLocator.substring(0, newLocator.indexOf("text()")-1);
+
+					if (newLocator.contains("text()")) {
+						newLocator = newLocator.substring(0, newLocator.indexOf("text()") - 1);
 					}
-					
-					String name = UtilsStaticAnalyzer.getSmartNameForWebElementGetter(newLocator, UtilsStaticAnalyzer.getDOMFromDirectory(target), target);
-					
-					proposedDiff = new abstractdt.Getter(source, target, "textual change", difference.getControlNodeDetail().getNode().getTextContent().trim(),
-							difference.getTestNodeDetail().getNode().getTextContent().trim(), 
-							newLocator, name);
-					
-					if(!personalisedDiffList.contains(proposedDiff)){
+
+					String name = UtilsStaticAnalyzer.getSmartNameForWebElementGetter(newLocator,
+							UtilsStaticAnalyzer.getDOMFromDirectory(target), target);
+
+					proposedDiff = new abstractdt.Getter(source, target, "textual change",
+							difference.getControlNodeDetail().getNode().getTextContent().trim(),
+							difference.getTestNodeDetail().getNode().getTextContent().trim(), newLocator, name);
+
+					if (!personalisedDiffList.contains(proposedDiff)) {
 						personalisedDiffList.add(proposedDiff);
 					}
-					
+
 					break;
 				}
-				
+
 				break;
-				
+
 			// DIFFERENT CHILDREN NUMBER: using simple getNode() to get what is going on
 			case DifferenceConstants.CHILD_NODE_NOT_FOUND_ID:
 
-				//System.out.println("[LOG] *** DIFFERENT NUMBER OF CHILDREN DETECTED " + difference.getId() + "***");
+				// System.out.println("[LOG] *** DIFFERENT NUMBER OF CHILDREN DETECTED " +
+				// difference.getId() + "***");
 
 				// adding
-				if(StringUtils.isEmpty(difference.getControlNodeDetail().getXpathLocation()) 
+				if (StringUtils.isEmpty(difference.getControlNodeDetail().getXpathLocation())
 						&& !difference.getTestNodeDetail().getValue().equals("BR")
 						&& !difference.getTestNodeDetail().getValue().equals("SCRIPT")
-						&& !difference.getTestNodeDetail().getValue().equals("TITLE")){ 
-					
-//					System.out.println("\tADDED ELEMENT");	
-//					System.out.println("\tadded element:\t" + difference.getTestNodeDetail().getNode());
-//					System.out.println("\tlocator\t: " + difference.getTestNodeDetail().getXpathLocation());
-					
+						&& !difference.getTestNodeDetail().getValue().equals("TITLE")) {
+
+					// System.out.println("\tADDED ELEMENT");
+					// System.out.println("\tadded element:\t" +
+					// difference.getTestNodeDetail().getNode());
+					// System.out.println("\tlocator\t: " +
+					// difference.getTestNodeDetail().getXpathLocation());
+
 					String newLocator = difference.getTestNodeDetail().getXpathLocation();
-					
-					if(newLocator.contains("text()")){
-						newLocator = newLocator.substring(0, newLocator.indexOf("text()")-1);
+
+					if (newLocator.contains("text()")) {
+						newLocator = newLocator.substring(0, newLocator.indexOf("text()") - 1);
 					}
-					
-					String name = UtilsStaticAnalyzer.getSmartNameForWebElementGetter(newLocator, UtilsStaticAnalyzer.getDOMFromDirectory(target), target);
-					
+
+					String name = UtilsStaticAnalyzer.getSmartNameForWebElementGetter(newLocator,
+							UtilsStaticAnalyzer.getDOMFromDirectory(target), target);
+
 					proposedDiff = new abstractdt.Getter(source, target, "added element", null,
-									difference.getTestNodeDetail().getNode().getNodeName(), 
-									newLocator, name);
-					
+							difference.getTestNodeDetail().getNode().getNodeName(), newLocator, name);
+
 					// NB: the equals has been redefined on the locator field!
-					if(!personalisedDiffList.contains(proposedDiff)){
+					if (!personalisedDiffList.contains(proposedDiff)) {
 						personalisedDiffList.add(proposedDiff);
 					}
-					
-					
-				} 
+
+				}
 				// deleting
-				else if(StringUtils.isEmpty(difference.getTestNodeDetail().getXpathLocation())){
+				else if (StringUtils.isEmpty(difference.getTestNodeDetail().getXpathLocation())) {
 					/*
-					System.out.println("\tREMOVED ELEMENT");
-					// TODO: trattare questo caso?
-					System.out.println("\tbefore:\t" + difference.getControlNodeDetail().getNode());
-					System.out.println("\tafter:\t" + difference.getTestNodeDetail().getNode());
-					System.out.println("\tlocator\t: " + difference.getTestNodeDetail().getXpathLocation());
-					
-					newName = difference.getTestNodeDetail().getXpathLocation();
-					if(newName.contains("text()")){
-						newName = newName.substring(0, newName.indexOf("text()")-1);
-					}
-					
-					name = UtilsStaticAnalyzer.getSmartNameForWebElement(newName, UtilsStaticAnalyzer.getDOMFromDirectory(target));
-					
-					
-					personalisedDiffList.add(
-							new abstractdt.Diff(source, target, "removed element", difference.getControlNodeDetail().getNode().getNodeValue(),
-									null, null, name));
-					*/
-				}
-				else {
+					 * System.out.println("\tREMOVED ELEMENT"); // TODO: trattare questo caso?
+					 * System.out.println("\tbefore:\t" +
+					 * difference.getControlNodeDetail().getNode()); System.out.println("\tafter:\t"
+					 * + difference.getTestNodeDetail().getNode());
+					 * System.out.println("\tlocator\t: " +
+					 * difference.getTestNodeDetail().getXpathLocation());
+					 * 
+					 * newName = difference.getTestNodeDetail().getXpathLocation();
+					 * if(newName.contains("text()")){ newName = newName.substring(0,
+					 * newName.indexOf("text()")-1); }
+					 * 
+					 * name = UtilsStaticAnalyzer.getSmartNameForWebElement(newName,
+					 * UtilsStaticAnalyzer.getDOMFromDirectory(target));
+					 * 
+					 * 
+					 * personalisedDiffList.add( new abstractdt.Diff(source, target,
+					 * "removed element",
+					 * difference.getControlNodeDetail().getNode().getNodeValue(), null, null,
+					 * name));
+					 */
+				} else {
 					/*
-					System.out.println("\tbefore:\t" + difference.getControlNodeDetail().getNode());
-					System.out.println("\tafter:\t" + difference.getTestNodeDetail().getNode());
-					System.out.println("\tlocator\t: " + difference.getTestNodeDetail().getXpathLocation());
-					
-					newName = difference.getTestNodeDetail().getXpathLocation();
-					if(newName.contains("text()")){
-						newName = newName.substring(0, newName.indexOf("text()")-1);
-					}
-					
-					name = UtilsStaticAnalyzer.getSmartNameForWebElementGetter(newName, UtilsStaticAnalyzer.getDOMFromDirectory(target), target);
-					
-					proposedDiff = new abstractdt.Diff(source, target, "modified element", difference.getControlNodeDetail().getNode().getNodeValue(),
-									difference.getTestNodeDetail().getNode().getNodeValue(), difference.getTestNodeDetail().getXpathLocation(), name);
-					
-					// NB: the equals has been redefined on the locator field!
-					if(!personalisedDiffList.contains(proposedDiff)){
-						personalisedDiffList.add(proposedDiff);
-					}
-					*/
+					 * System.out.println("\tbefore:\t" +
+					 * difference.getControlNodeDetail().getNode()); System.out.println("\tafter:\t"
+					 * + difference.getTestNodeDetail().getNode());
+					 * System.out.println("\tlocator\t: " +
+					 * difference.getTestNodeDetail().getXpathLocation());
+					 * 
+					 * newName = difference.getTestNodeDetail().getXpathLocation();
+					 * if(newName.contains("text()")){ newName = newName.substring(0,
+					 * newName.indexOf("text()")-1); }
+					 * 
+					 * name = UtilsStaticAnalyzer.getSmartNameForWebElementGetter(newName,
+					 * UtilsStaticAnalyzer.getDOMFromDirectory(target), target);
+					 * 
+					 * proposedDiff = new abstractdt.Diff(source, target, "modified element",
+					 * difference.getControlNodeDetail().getNode().getNodeValue(),
+					 * difference.getTestNodeDetail().getNode().getNodeValue(),
+					 * difference.getTestNodeDetail().getXpathLocation(), name);
+					 * 
+					 * // NB: the equals has been redefined on the locator field!
+					 * if(!personalisedDiffList.contains(proposedDiff)){
+					 * personalisedDiffList.add(proposedDiff); }
+					 */
 				}
-				
+
 				break;
 
 			}
-			
+
 		}
 		return personalisedDiffList;
 	}

@@ -62,139 +62,139 @@ public class UtilsStaticAnalyzer {
 
 	/**
 	 * fills the statesList with the information parsed from result.json
-	 * @param clustering 
-	 * @return 
+	 * 
+	 * @param clustering
+	 * @return
 	 */
-	public static List<State> createMergedStateObjects(){
-		
+	public static List<State> createMergedStateObjects() {
+
 		List<State> statesList = StaticAnalyzer.getStatesList();
-		
+
 		JSONParser parser = new JSONParser();
-		
+
 		try {
-			
+
 			// dangerous if gen_po_dir is a precious dir in the file system!!!
-			//FileUtils.deleteDirectory(new File(gen_po_dir));
+			// FileUtils.deleteDirectory(new File(gen_po_dir));
 			int total_getters = 0;
-                        
+
 			Object obj = null;
-			if(Settings.CLUSTERING) {
+			if (Settings.CLUSTERING) {
 				try {
-				obj = parser.parse(new FileReader(Settings.OUT_DIR + "resultAfterMerging.json"));
+					obj = parser.parse(new FileReader(Settings.OUT_DIR + "resultAfterMerging.json"));
 				} catch (FileNotFoundException e) {
 					System.out.println("[LOG]\tFile output/resultAfterMerging.json not found.");
 					System.exit(1);
 				}
-        		}
-			else {
+			} else {
 				try {
-					obj = parser.parse(new FileReader(Settings.OUT_DIR + "result.json"));	
+					obj = parser.parse(new FileReader(Settings.OUT_DIR + "result.json"));
 				} catch (FileNotFoundException e) {
 					System.out.println("[LOG]\tFile output/result.json not found.");
 					System.exit(1);
 				}
-				
+
 			}
 
 			JSONObject jsonObject = (JSONObject) obj;
 			JSONObject states = (JSONObject) jsonObject.get("states");
 			JSONArray edges = (JSONArray) jsonObject.get("edges");
-			
+
 			// create a PO for each state
-			for (Object state : states.keySet()) {	
-				
+			for (Object state : states.keySet()) {
+
 				JSONObject stateObject = (JSONObject) states.get(state);
-				
+
 				// create a new State object
 				State s = new State((String) stateObject.get("name"), (String) stateObject.get("url"));
-				
+
 				// name the state with the URL
 				s.setName(UtilsStaticAnalyzer.getClassNameFromUrl(s, statesList));
-				
+
 				// save the DOM of the state
-				s.setDom(UtilsStaticAnalyzer.getDOMFromDirectory(s.getStateId())); 
-				
+				s.setDom(UtilsStaticAnalyzer.getDOMFromDirectory(s.getStateId()));
+
 				JSONArray candidates = (JSONArray) stateObject.get("candidateElements");
 				JSONArray failedEvents = (JSONArray) stateObject.get("failedEvents");
-				
+
 				// save the web elements of the state
 				Set<CandidateWebElement> totalListOfWebElements = new HashSet<CandidateWebElement>();
-				totalListOfWebElements = getCandidateWebElementsList(candidates, failedEvents, s.getStateId(), s.getDom());
-				
+				totalListOfWebElements = getCandidateWebElementsList(candidates, failedEvents, s.getStateId(),
+						s.getDom());
+
 				// TODO: create web elements from form fields. DIFFICULT
-				//getWebElementsContainedInForms(s);
-				
+				// getWebElementsContainedInForms(s);
+
 				s.setWebElements(totalListOfWebElements);
-				
+
 				setConnections(state, edges, s);
-				
+
 				s.setForms(createFormObjects(s));
-			
+
 				statesList.add(s);
 			}
-			
+
 			List<State> toRemove = new LinkedList<State>();
-			
+
 			for (State s : statesList) {
-				
+
 				List<String> slaves = UtilsStaticAnalyzer.getSlaves(s.getStateId(), Settings.OUT_DIR);
-				
+
 				for (String slave : slaves) {
 					int index = UtilsStaticAnalyzer.getState(statesList, slave);
 					State toMerge = statesList.get(index);
-					
-					// merge web elements					
+
+					// merge web elements
 					s.getWebElements().addAll(toMerge.getWebElements());
-					
+
 					// merge links methods
 					for (Edge e : toMerge.getLinks()) {
-						if(!slaves.contains(e.getTo())){
+						if (!slaves.contains(e.getTo())) {
 							s.getLinks().addAll(toMerge.getLinks());
 						}
 					}
-					
+
 					// merge forms methods
 					// duplicates are removed depending on the
 					// form name!
 					Set<Form> stateForms = s.getForms();
 					Set<Form> toAdd = new HashSet<Form>();
-					
+
 					for (Form formToAdd : toMerge.getForms()) {
-						
-						if(stateForms.size() == 0){
+
+						if (stateForms.size() == 0) {
 							toAdd.addAll(toMerge.getForms());
-						}
-						else {
-							if(!stateForms.contains(formToAdd)){
-								if(!toAdd.contains(formToAdd))
+						} else {
+							if (!stateForms.contains(formToAdd)) {
+								if (!toAdd.contains(formToAdd))
 									toAdd.add(formToAdd);
 							}
 						}
 					}
 					s.getForms().addAll(toAdd);
-					
+
 					// add the state to the list to be removed
 					toRemove.add(toMerge);
 				}
-				
+
 				// add diffs
 				// TODO: da controllare il funzionamento di s.getStateId()
 				Set<Getter> list_diff = UtilsStaticAnalyzer.retrieveDiffsFromFile(s.getStateId());
 				s.setDiffs(list_diff);
-				
+
 				System.out.println("[LOG]\t" + list_diff.size() + " getter(s) found in " + s.getName());
 				total_getters += list_diff.size();
 			}
-			
+
 			System.out.println("[LOG]\t#states before merging: " + statesList.size());
-			
+
 			statesList.removeAll(toRemove);
-			
+
 			System.out.println("[LOG]\t#states after merging: " + statesList.size());
-					
+
 			UtilsStaticAnalyzer.printStatesList(statesList);
 			System.out.println("[LOG]\tTotal generated getter(s): " + total_getters);
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ParseException e) {
@@ -202,7 +202,7 @@ public class UtilsStaticAnalyzer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return statesList;
 	}
 

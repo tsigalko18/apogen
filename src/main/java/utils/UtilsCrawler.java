@@ -109,7 +109,7 @@ public class UtilsCrawler {
 		setCustomStateVertexFactory(builder);
 
 		// set input values
-		if(Settings.USE_INPUT_SPECIFICATION)
+		if (Settings.USE_INPUT_SPECIFICATION)
 			builder.crawlRules().setInputSpec(getInputSpecification());
 
 		// add CrawlOverview plugin
@@ -125,8 +125,8 @@ public class UtilsCrawler {
 	}
 
 	/**
-	 * Input specification containing credentials The credentials are read from
-	 * the app.properties file
+	 * Input specification containing credentials The credentials are read from the
+	 * app.properties file
 	 * 
 	 * @return InputSpecification
 	 */
@@ -200,37 +200,28 @@ public class UtilsCrawler {
 				input.setValuesInForm(newOwner).beforeClickElement("button").withText("Add Owner");
 
 				/*
-				 * String search_field = configFile.getProperty("SEARCH_FIELD");
-				 * String search_value = configFile.getProperty("SEARCH_VALUE");
-				 * String search_button_field =
-				 * configFile.getProperty("SEARCH_BUTTON_FIELD"); String
-				 * search_button_value =
-				 * configFile.getProperty("SEARCH_BUTTON_VALUE");
+				 * String search_field = configFile.getProperty("SEARCH_FIELD"); String
+				 * search_value = configFile.getProperty("SEARCH_VALUE"); String
+				 * search_button_field = configFile.getProperty("SEARCH_BUTTON_FIELD"); String
+				 * search_button_value = configFile.getProperty("SEARCH_BUTTON_VALUE");
 				 * 
-				 * Form search = new Form();
-				 * search.field(search_field).setValue(search_value);
+				 * Form search = new Form(); search.field(search_field).setValue(search_value);
 				 * input.setValuesInForm(search).beforeClickElement(
 				 * search_button_field).withText(search_button_value);
 				 * 
-				 * String pet_name_field =
-				 * configFile.getProperty("PET_NAME_FIELD"); String
-				 * pet_name_value = configFile.getProperty("PET_NAME_VALUE");
-				 * String pet_birthday_field =
-				 * configFile.getProperty("PET_BIRTHDATE_FIELD"); String
-				 * pet_birthday_value =
-				 * configFile.getProperty("PET_BIRTHDATE_VALUE"); String
-				 * pet_type_field = configFile.getProperty("PET_TYPE_FIELD");
-				 * String pet_type_value =
-				 * configFile.getProperty("PET_TYPE_VALUE"); String
-				 * pet_button_field =
-				 * configFile.getProperty("PET_ADD_BUTTON_FIELD"); String
-				 * pet_button_value =
-				 * configFile.getProperty("PET_ADD_BUTTON_VALUE");
+				 * String pet_name_field = configFile.getProperty("PET_NAME_FIELD"); String
+				 * pet_name_value = configFile.getProperty("PET_NAME_VALUE"); String
+				 * pet_birthday_field = configFile.getProperty("PET_BIRTHDATE_FIELD"); String
+				 * pet_birthday_value = configFile.getProperty("PET_BIRTHDATE_VALUE"); String
+				 * pet_type_field = configFile.getProperty("PET_TYPE_FIELD"); String
+				 * pet_type_value = configFile.getProperty("PET_TYPE_VALUE"); String
+				 * pet_button_field = configFile.getProperty("PET_ADD_BUTTON_FIELD"); String
+				 * pet_button_value = configFile.getProperty("PET_ADD_BUTTON_VALUE");
 				 * 
 				 * Form addPet = new Form();
 				 * addPet.field(pet_name_field).setValue(pet_name_value);
-				 * addPet.field(pet_birthday_field).setValue(pet_birthday_value)
-				 * ; addPet.field(pet_type_field).setValue(pet_type_value);
+				 * addPet.field(pet_birthday_field).setValue(pet_birthday_value) ;
+				 * addPet.field(pet_type_field).setValue(pet_type_value);
 				 * input.setValuesInForm(addPet).beforeClickElement(
 				 * pet_button_field).withText(pet_button_value);
 				 */

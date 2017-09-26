@@ -48,8 +48,7 @@ public class StaticAnalyzer {
 	 * @throws ParserConfigurationException
 	 * @throws ParseException
 	 */
-	public static void start() throws 
-			IOException, ParserConfigurationException, SAXException, ParseException {
+	public static void start() throws IOException, ParserConfigurationException, SAXException, ParseException {
 		init();
 		run();
 	}
@@ -62,15 +61,13 @@ public class StaticAnalyzer {
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 */
-	private static void init() throws IOException,
-			ParserConfigurationException, SAXException, ParseException {
+	private static void init() throws IOException, ParserConfigurationException, SAXException, ParseException {
 
 		statesList = new LinkedList<State>();
 
 		// default icon, custom title
-		int n = JOptionPane.showConfirmDialog(null,
-				"Would you like to run clustering over the model?\n",
-				"Clustering", JOptionPane.YES_NO_OPTION);
+		int n = JOptionPane.showConfirmDialog(null, "Would you like to run clustering over the model?\n", "Clustering",
+				JOptionPane.YES_NO_OPTION);
 
 		if (n == JOptionPane.YES_OPTION) {
 			Settings.CLUSTERING = true;
@@ -81,9 +78,8 @@ public class StaticAnalyzer {
 	}
 
 	/**
-	 * Merges the similar states accordingly to a the clustering result This
-	 * method modifies Crawljax outputs in order to provide cluster and diff
-	 * information
+	 * Merges the similar states accordingly to a the clustering result This method
+	 * modifies Crawljax outputs in order to provide cluster and diff information
 	 * 
 	 * @param configFile
 	 * @throws IOException
@@ -91,10 +87,10 @@ public class StaticAnalyzer {
 	 * @throws SAXException
 	 * @throws ParseException
 	 */
-	public static void calculateClusters() throws IOException,
-			ParserConfigurationException, SAXException, ParseException {
+	public static void calculateClusters()
+			throws IOException, ParserConfigurationException, SAXException, ParseException {
 
-		System.out.println("[LOG] STARTED STATES MERGE");
+		System.out.println("[LOG]\tSTARTED STATES MERGE");
 
 		JFrame parent = new JFrame();
 
@@ -102,49 +98,37 @@ public class StaticAnalyzer {
 		while (n == 1) {
 
 			String a = null, f = null;
-			
+
 			// ask for algorithm
-			
-			Object[] algo_possibilities = {"Hierarchical", "K-means"};//, "K-medoids"};
-			
-			String s = (String) JOptionPane.showInputDialog(
-			                    null,
-			                    "Choose the clustering algorithm",
-			                    "Enter algorithm",
-			                    JOptionPane.INFORMATION_MESSAGE,
-			                    null,
-			                    algo_possibilities,
-			                    "Hierarchical");
-			
-			if ((s != null) && (s.length() > 0)) {
-			    if(s.equals("Hierarchical")){
-			    	a = "0";
-			    } else if(s.equals("K-means")){
-			    	a = "1";
-			    }
-			}
-			
-			// ask for feature
-			
-			Object[] feat_possibilities = {"DOM-RTED", "DOM-Lev", "Tag Frequency", "URL-Lev"};
-			
-			s = (String) JOptionPane.showInputDialog(
-                    null,
-                    "Choose the feature",
-                    "Enter feature",
-                    JOptionPane.INFORMATION_MESSAGE,
-                    null,
-                    feat_possibilities,
-                    "DOM-RTED");
+
+			Object[] algo_possibilities = { "Hierarchical", "K-means" };// , "K-medoids"};
+
+			String s = (String) JOptionPane.showInputDialog(null, "Choose the clustering algorithm", "Enter algorithm",
+					JOptionPane.INFORMATION_MESSAGE, null, algo_possibilities, "Hierarchical");
 
 			if ((s != null) && (s.length() > 0)) {
-				if(s.equals("DOM-RTED")){
+				if (s.equals("Hierarchical")) {
+					a = "0";
+				} else if (s.equals("K-means")) {
+					a = "1";
+				}
+			}
+
+			// ask for feature
+
+			Object[] feat_possibilities = { "DOM-RTED", "DOM-Lev", "Tag Frequency", "URL-Lev" };
+
+			s = (String) JOptionPane.showInputDialog(null, "Choose the feature", "Enter feature",
+					JOptionPane.INFORMATION_MESSAGE, null, feat_possibilities, "DOM-RTED");
+
+			if ((s != null) && (s.length() > 0)) {
+				if (s.equals("DOM-RTED")) {
 					f = "0";
-				} else if(s.equals("DOM-Lev")){
+				} else if (s.equals("DOM-Lev")) {
 					f = "1";
-				} else if(s.equals("Tag Frequency")){
+				} else if (s.equals("Tag Frequency")) {
 					f = "2";
-				} else if(s.equals("URL-Lev")){
+				} else if (s.equals("URL-Lev")) {
 					f = "3";
 				}
 			}
@@ -159,13 +143,11 @@ public class StaticAnalyzer {
 				SpinnerNumberModel sModel = new SpinnerNumberModel(2, 2, 30, 1);
 				JSpinner spinner = new JSpinner(sModel);
 
-				int option = JOptionPane.showOptionDialog(parent, spinner,
-						"Enter a number of clusters",
-						JOptionPane.DEFAULT_OPTION,
-						JOptionPane.QUESTION_MESSAGE, null, null, null);
-				
+				int option = JOptionPane.showOptionDialog(parent, spinner, "Enter a number of clusters",
+						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+
 				if (option == JOptionPane.CANCEL_OPTION) { // user hits cancel
-					
+
 				} else if (option == JOptionPane.OK_OPTION) { // user entered a number
 					Settings.NUMBER_OF_CLUSTERS = spinner.getValue().toString();
 				}
@@ -198,14 +180,12 @@ public class StaticAnalyzer {
 
 			// launch Clusters Visual Editor
 			WebDriver cve = new FirefoxDriver();
-			String cve_path = "file://" + System.getProperty("user.dir")
-							  			+ "/cve/index.html";
+			String cve_path = "file://" + System.getProperty("user.dir") + "/cve/index.html";
 			cve.manage().window().setPosition(new Point(0, 0));
 			cve.manage().window().setSize(new Dimension(850, 1024));
 			cve.get(cve_path);
 
-			n = JOptionPane.showConfirmDialog(null,
-					"Would you like to proceed?", "Clustering correct",
+			n = JOptionPane.showConfirmDialog(null, "Would you like to proceed?", "Clustering correct",
 					JOptionPane.YES_NO_OPTION);
 			if (n == 0) {
 				break;
@@ -214,41 +194,40 @@ public class StaticAnalyzer {
 
 		System.gc();
 
-		//n = 1;
+		// n = 1;
 		String res = "";
-		//while (n == 1) {
-			Runnable r = new Runnable() {
-		
-				public void run() {
-					JFileChooser jfc = new JFileChooser();
-					jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-					// if(jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
-					// String file = jfc.getSelectedFile().getAbsolutePath();
-					// }
-				}
-			};
+		// while (n == 1) {
+		Runnable r = new Runnable() {
 
-			SwingUtilities.invokeLater(r);
-		
-			int returnVal;
-			
-			while(res.equals("") && !res.contains("clustersModified.txt")){
-				JFileChooser fc = new JFileChooser();
-				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				returnVal = fc.showOpenDialog(parent);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					res = fc.getSelectedFile().getAbsolutePath();
-				}
-				if(res.equals("") || !res.contains("clustersModified.txt")){
-					JOptionPane.showMessageDialog(null, "Clusters File incorrect");
-					res = "";
-				}
-				else {
-					n = 0;
-				}
+			public void run() {
+				JFileChooser jfc = new JFileChooser();
+				jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				// if(jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
+				// String file = jfc.getSelectedFile().getAbsolutePath();
+				// }
 			}
-			
-		//}
+		};
+
+		SwingUtilities.invokeLater(r);
+
+		int returnVal;
+
+		while (res.equals("") && !res.contains("clustersModified.txt")) {
+			JFileChooser fc = new JFileChooser();
+			fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			returnVal = fc.showOpenDialog(parent);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				res = fc.getSelectedFile().getAbsolutePath();
+			}
+			if (res.equals("") || !res.contains("clustersModified.txt")) {
+				JOptionPane.showMessageDialog(null, "Clusters File incorrect");
+				res = "";
+			} else {
+				n = 0;
+			}
+		}
+
+		// }
 
 		UtilsClustering.readClusteringResult(res);
 		UtilsClustering.createCrawljaxResultCopy();
@@ -258,9 +237,9 @@ public class StaticAnalyzer {
 	}
 
 	/**
-	 * runs the static analyzer: it parses the information contained in the
-	 * Document Object Model retrieved by Crawljax and gets what is necessary
-	 * for the page object's code generation
+	 * runs the static analyzer: it parses the information contained in the Document
+	 * Object Model retrieved by Crawljax and gets what is necessary for the page
+	 * object's code generation
 	 */
 	private static void run() {
 		System.out.println("[LOG]\tSTARTED STATIC ANALYSIS");
@@ -280,4 +259,3 @@ public class StaticAnalyzer {
 	}
 
 }
-
