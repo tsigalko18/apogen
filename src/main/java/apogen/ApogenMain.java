@@ -1,5 +1,7 @@
 package apogen;
 
+import apogen.Settings.CrawlingMode;
+
 public class ApogenMain {
 
 	/**
@@ -20,17 +22,19 @@ public class ApogenMain {
 		System.out.println("[LOG]\tCrawling: " + Settings.CRAWLING);
 		System.out.println("[LOG]\tClustering: " + Settings.CLUSTERING);
 	}
-	
+
 	public static void run() throws Exception {
 
-		if (Settings.CRAWLING)
-			Crawler.crawl();
+		if (Settings.CRAWLING == CrawlingMode.SINGLE)
+			Crawler.runFirstCrawling();
+		else if (Settings.CRAWLING == CrawlingMode.DOUBLE)
+			Crawler.runDoubleCrawling();
 
-		if (Settings.REPEAT_STATIC_ANALYSIS)
-			StaticAnalyzer.start();
-
-		if (Settings.GENERATE_CODE)
-			CodeGenerator.run();
+//		if (Settings.REPEAT_STATIC_ANALYSIS)
+//			StaticAnalyzer.start();
+//
+//		if (Settings.GENERATE_CODE)
+//			CodeGenerator.run();
 
 		System.exit(0);
 	}

@@ -26,7 +26,7 @@ import apogen.Settings;
  * @author Andrea Stocco
  *
  */
-public class UtilsCrawler {
+public class SecondCrawlConfigurationAndSpecification {
 
 	/**
 	 * Personalized list of Crawljax crawling rules
@@ -71,38 +71,38 @@ public class UtilsCrawler {
 
 		// if there is no pre-specified configuration, set no limits
 
-		// set crawling depth
+		/* set crawling depth. */
 		if (crawl_depth != 0) {
 			builder.setMaximumDepth(crawl_depth);
 		} else {
 			builder.setUnlimitedCrawlDepth();
 		}
 
-		// set crawling runtime
+		/* set crawling runtime. */
 		if (max_runtime != 0) {
 			builder.setMaximumRunTime(max_runtime, TimeUnit.MINUTES);
 		} else {
 			builder.setUnlimitedRuntime();
 		}
 
-		// set maximum states
+		/* set maximum states. */
 		if (max_states != 0) {
 			builder.setMaximumStates(max_states);
 		} else {
 			builder.setUnlimitedStates();
 		}
 
-		// set timeouts
+		/* set timeouts. */
 		builder.crawlRules().waitAfterReloadUrl(timeoutReload, TimeUnit.MILLISECONDS);
 		builder.crawlRules().waitAfterEvent(timeoutEvent, TimeUnit.MILLISECONDS);
 
-		// set the type of browser (Firefox=FF, PhantomJS=PH)
-		if (browser.equals("FF")) {
-			builder.setBrowserConfig(new BrowserConfiguration(BrowserType.FIREFOX, 1));
-		} else if (browser.equals("PH")) {
+		// set the type of browser (Chrome=CH, PhantomJS=PH)
+		if (browser.equals("PH")) {
 			builder.setBrowserConfig(new BrowserConfiguration(BrowserType.PHANTOMJS, 1));
+		} else if (browser.equals("CH")) {
+			builder.setBrowserConfig(new BrowserConfiguration(BrowserType.CHROME, 1));
 		} else {
-			throw new Exception("[ERROR]\tconfig.properties: browser not recognized (use FF, PH)");
+			throw new Exception("[ERROR]\tBrowserType not recognized (use CH, PH)");
 		}
 
 		// set custom state comparison
@@ -116,7 +116,7 @@ public class UtilsCrawler {
 		builder.addPlugin(new CrawlOverview());
 
 		// CrawlOverview output
-		File outFolder = new File(Settings.OUT_DIR);
+		File outFolder = new File(Settings.OUT_DIR2);
 		if (outFolder.exists()) {
 			FileUtils.deleteDirectory(outFolder);
 		}

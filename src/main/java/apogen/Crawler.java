@@ -6,22 +6,50 @@ import com.crawljax.core.CrawljaxRunner;
 import com.crawljax.core.configuration.CrawljaxConfiguration;
 import com.crawljax.core.configuration.CrawljaxConfiguration.CrawljaxConfigurationBuilder;
 
-import utils.UtilsCrawler;
+import utils.FirstCrawlConfigurationAndSpecification;
+import utils.SecondCrawlConfigurationAndSpecification;
 
 public class Crawler {
 
 	protected static String diff_dir;
 
 	/**
-	 * Initialize and Run the crawler
+	 * perform one crawling only
 	 * 
 	 * @throws Exception
 	 */
-	public static void crawl() throws Exception {
+	public static void runFirstCrawling() throws Exception {
+		firstCrawl();
+	}
 
-		CrawljaxConfigurationBuilder b = Crawler.initCrawljax();
+	/**
+	 * perform two crawlings in series
+	 * 
+	 * @throws Exception
+	 */
+	public static void runDoubleCrawling() throws Exception {
+		firstCrawl();
+		secondCrawl();
+	}
+
+	/**
+	 * init and run the first crawl
+	 * 
+	 * @throws Exception
+	 */
+	private static void firstCrawl() throws Exception {
+		CrawljaxConfigurationBuilder b = Crawler.initFirstCrawl();
 		Crawler.runCrawljax(b);
+	}
 
+	/**
+	 * init and run the second crawl
+	 * 
+	 * @throws Exception
+	 */
+	private static void secondCrawl() throws Exception {
+		CrawljaxConfigurationBuilder b = Crawler.initSecondCrawl();
+		Crawler.runCrawljax(b);
 	}
 
 	/**
@@ -30,25 +58,48 @@ public class Crawler {
 	 * @return CrawljaxConfigurationBuilder
 	 * @throws Exception
 	 */
-	private static CrawljaxConfigurationBuilder initCrawljax() throws Exception {
+	private static CrawljaxConfigurationBuilder initFirstCrawl() throws Exception {
 
-		System.out.print("[LOG]\tCRAWLER SETUP...");
+		System.out.println("[LOG]\tFIRST CRAWL SETUP");
 
 		CrawljaxConfigurationBuilder builder = CrawljaxConfiguration.builderFor(Settings.URL);
 
 		try {
-			UtilsCrawler.myCrawlRules(builder);
+			FirstCrawlConfigurationAndSpecification.myCrawlRules(builder);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		System.out.println("[LOG]\tCOMPLETED SUCCESSFULLY");
+		System.out.println("[LOG]\tFIRST CRAWL SETUP COMPLETED");
 
 		return builder;
 	}
 
 	/**
-	 * Run Crawljax with the configurations in input
+	 * initializes the properties and the crawler
+	 * 
+	 * @return CrawljaxConfigurationBuilder
+	 * @throws Exception
+	 */
+	private static CrawljaxConfigurationBuilder initSecondCrawl() throws Exception {
+
+		System.out.println("[LOG]\tSECOND CRAWL SETUP");
+
+		CrawljaxConfigurationBuilder builder = CrawljaxConfiguration.builderFor(Settings.URL);
+
+		try {
+			SecondCrawlConfigurationAndSpecification.myCrawlRules(builder);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("[LOG]\tSECOND CRAWL SETUP COMPLETED");
+
+		return builder;
+	}
+
+	/**
+	 * Run Crawljax with the configurations give in input
 	 * 
 	 * @param CrawljaxConfigurationBuilder
 	 *            builder
@@ -61,7 +112,6 @@ public class Crawler {
 
 		System.out.println("[LOG]\tCRAWLING ENDED WITH STATUS: " + crawljax.getReason());
 		System.out.println("[LOG]\tCRAWLING OF " + Settings.URL + " FINISHED");
-		System.out.println("[LOG]\tCRAWLING RESULTS SAVED IN " + Settings.OUT_DIR);
 	}
 
 }
