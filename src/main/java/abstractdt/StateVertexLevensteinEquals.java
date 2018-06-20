@@ -31,27 +31,10 @@ public class StateVertexLevensteinEquals implements StateVertex {
 		this.strippedDom = strippedDom;
 	}
 
-	// 
-	// public int hashCode() {
-	// return Objects.hashCode(strippedDom);
-	// }
-	//
-	// 
-	// public boolean equals(Object object) {
-	// if (object instanceof StateVertex) {
-	// StateVertex that = (StateVertex) object;
-	// return Objects.equal(this.strippedDom, that.getStrippedDom());
-	// }
-	// return false;
-	// }
-
-	
 	public int hashCode() {
 		return Objects.hashCode(strippedDom);
-		// return 1;
 	}
 
-	
 	public boolean equals(Object object) {
 
 		if (object instanceof StateVertex) {
@@ -66,42 +49,34 @@ public class StateVertexLevensteinEquals implements StateVertex {
 
 	}
 
-	
 	public String getName() {
 		return name;
 	}
 
-	
 	public String getDom() {
 		return dom;
 	}
 
-	
 	public String getStrippedDom() {
 		return strippedDom;
 	}
 
-	
 	public String getUrl() {
 		return url;
 	}
 
-	
 	public int getId() {
 		return id;
 	}
 
-	
 	public Document getDocument() throws IOException {
 		return DomUtils.asDocument(this.dom);
 	}
 
-	
 	public void setElementsFound(LinkedList<CandidateElement> elements) {
 		this.candidateElements = ImmutableList.copyOf(elements);
 	}
 
-	
 	public ImmutableList<CandidateElement> getCandidateElements() {
 		return candidateElements;
 	}

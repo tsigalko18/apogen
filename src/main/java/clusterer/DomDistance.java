@@ -21,6 +21,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.xml.sax.SAXException;
 
+import apogen.Settings;
 import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
@@ -66,9 +67,9 @@ public class DomDistance {
 
 	private void calculateDomDistanceMatrix() throws IOException {
 
-		System.out.println("[LOG] DOMs distance matrix using " + distance + ": ");
+		System.out.println("[LOG]\tDOMs distance matrix using " + distance + ": ");
 
-		String domsDirectory = directory;
+		String domsDirectory = Settings.DOMS_DIR1;
 		File dir = new File(domsDirectory);
 
 		List<File> files = (List<File>) FileUtils.listFiles(dir, FileFilterUtils.suffixFileFilter("html"),

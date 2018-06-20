@@ -81,14 +81,14 @@ public class UtilsStaticAnalyzer {
 			Object obj = null;
 			if (Settings.CLUSTERING) {
 				try {
-					obj = parser.parse(new FileReader(Settings.OUT_DIR + "resultAfterMerging.json"));
+					obj = parser.parse(new FileReader(Settings.OUT_DIR1 + "resultAfterMerging.json"));
 				} catch (FileNotFoundException e) {
 					System.out.println("[LOG]\tFile output/resultAfterMerging.json not found.");
 					System.exit(1);
 				}
 			} else {
 				try {
-					obj = parser.parse(new FileReader(Settings.OUT_DIR + "result.json"));
+					obj = parser.parse(new FileReader(Settings.OUT_DIR1 + "result.json"));
 				} catch (FileNotFoundException e) {
 					System.out.println("[LOG]\tFile output/result.json not found.");
 					System.exit(1);
@@ -138,7 +138,7 @@ public class UtilsStaticAnalyzer {
 
 			for (State s : statesList) {
 
-				List<String> slaves = UtilsStaticAnalyzer.getSlaves(s.getStateId(), Settings.OUT_DIR);
+				List<String> slaves = UtilsStaticAnalyzer.getSlaves(s.getStateId(), Settings.OUT_DIR1);
 
 				for (String slave : slaves) {
 					int index = UtilsStaticAnalyzer.getState(statesList, slave);
@@ -232,7 +232,7 @@ public class UtilsStaticAnalyzer {
 		JSONParser parser = new JSONParser();
 		Object obj;
 		try {
-			obj = parser.parse(new FileReader(Settings.OUT_DIR + "cluster.json"));
+			obj = parser.parse(new FileReader(Settings.OUT_DIR1 + "cluster.json"));
 		} catch (IOException e1) {
 			System.out.println("[LOG]\tfile cluster.json missing for diffs calculation");
 			return new HashSet<Getter>();
@@ -830,7 +830,7 @@ public class UtilsStaticAnalyzer {
 
 	/**
 	 * TODO: to check the existence of states with same names the use of equals is
-	 * not applicable. contains seems to work, but it has to be test with many
+	 * not applicable. contains seems to work, but it has to be tested with many
 	 * different states
 	 */
 	private static String solveAmbiguity(String toTrim, List<State> statesList) {
@@ -916,7 +916,7 @@ public class UtilsStaticAnalyzer {
 	 */
 	public static String getDOMFromDirectory(String state) throws IOException {
 
-		String doms_dir = Settings.DOMS_DIR;
+		String doms_dir = Settings.DOMS_DIR1;
 
 		String result = "";
 		String fileToRetrieve = doms_dir + state + ".html";

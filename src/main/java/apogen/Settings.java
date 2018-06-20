@@ -24,14 +24,26 @@ public class Settings {
 	public static final String BROWSER = "PH"; // CH-FF-PH
 
 	// Apogen Settings
-	public static CrawlingMode CRAWLING = CrawlingMode.DOUBLE;
-	public static boolean CLUSTERING = true;
+	public static CrawlingMode CRAWLING = CrawlingMode.SINGLE;
+
+	public static boolean CLUSTERING = false;
+	public static ClusteringAlgorithm CLUSTERINGALGO = ClusteringAlgorithm.HIERARCHICAL;
+	public static Feature FEATURE_VECTOR = Feature.DOM_RTED;
+
 	public static boolean REPEAT_STATIC_ANALYSIS = true;
 	public static boolean GENERATE_CODE = true;
 	public static boolean USE_INPUT_SPECIFICATION = false;
 	public static String NUMBER_OF_CLUSTERS = "2";
 
 	public enum CrawlingMode {
-		SINGLE, DOUBLE 
+		SINGLE, DOUBLE
 	};
+
+	public enum ClusteringAlgorithm {
+		HIERARCHICAL, KMEANS
+	}
+
+	public enum Feature {
+		DOM_RTED, DOM_LEVENSHTEIN, TAG_FREQUENCY, URL_LEVENSHTEIN
+	}
 }

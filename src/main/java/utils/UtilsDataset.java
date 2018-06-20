@@ -17,6 +17,8 @@ import org.apache.commons.io.FileUtils;
 import org.json.simple.parser.ParseException;
 import org.xml.sax.SAXException;
 
+import apogen.Settings;
+import apogen.Settings.Feature;
 import clusterer.DomDistance;
 import clusterer.TagFrequency;
 import clusterer.UrlDistance;
@@ -64,20 +66,20 @@ public class UtilsDataset {
 		domsRobustTreeEditDistancesDataset = new DefaultDataset();
 	}
 
-	public void createDatasets(String f) throws IOException {
+	public void createDatasets() throws IOException {
 
 		createClustersDir();
 
-		if (f.equals("0")) {
+		if (Settings.FEATURE_VECTOR == Feature.DOM_RTED) {
 			createDomsRTEDDistancesMatrix();
-		} else if (f.equals("1")) {
+		} else if (Settings.FEATURE_VECTOR == Feature.DOM_LEVENSHTEIN) {
 			createDomsLevenshteinDistancesMatrix();
-		} else if (f.equals("2")) {
+		} else if (Settings.FEATURE_VECTOR == Feature.TAG_FREQUENCY) {
 			createTagsFrequenciesMatrix();
-		} else if (f.equals("3")) {
+		} else if (Settings.FEATURE_VECTOR == Feature.URL_LEVENSHTEIN) {
 			createUrlsDistancesMatrix();
 		} else {
-			throw new InputMismatchException("[ERR] UtilsDataset@createDatasets: Unexpected dataset input");
+			throw new InputMismatchException("[ERR]\tUtilsDataset@createDatasets: Unexpected dataset input");
 		}
 		// createWordsFrequenciesMatrix();
 	}

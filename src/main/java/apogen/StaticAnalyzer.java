@@ -65,15 +65,8 @@ public class StaticAnalyzer {
 
 		statesList = new LinkedList<State>();
 
-		// default icon, custom title
-		int n = JOptionPane.showConfirmDialog(null, "Would you like to run clustering over the model?\n", "Clustering",
-				JOptionPane.YES_NO_OPTION);
-
-		if (n == JOptionPane.YES_OPTION) {
-			Settings.CLUSTERING = true;
+		if (Settings.CLUSTERING) {
 			calculateClusters();
-		} else {
-			Settings.CLUSTERING = false;
 		}
 	}
 
@@ -133,10 +126,11 @@ public class StaticAnalyzer {
 				}
 			}
 
-			String d = Settings.OUT_DIR;
+			String d = Settings.DOMS_DIR1; 
+					//Settings.FINAL_OUTPUT_DIR;
 
 			UtilsDataset ud = new UtilsDataset(d);
-			ud.createDatasets(f);
+			ud.createDatasets();
 
 			try {
 
